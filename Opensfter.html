@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Software India: free alternatives to paid software</title>
+<meta name="description" content="Find free and open-source alternatives to Photoshop, MS Office, Zoom, QuickBooks and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f8f7; --ink:#12231f; --muted:#51635e; --line:#d3dfdb;
+  --accent:#0a6b57; --accent-ink:#ffffff; --strike:#b3423a; --chip:#e5eeeb;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1a17; --ink:#e8f1ee; --muted:#9db3ac; --line:#2a3d37;
+        --accent:#4fd1b0; --accent-ink:#06211a; --strike:#ff8a80; --chip:#1a2b26;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Source Sans 3",system-ui,sans-serif}
+.top,main,.chips,.foot{max-width:760px;margin:0 auto;padding:0 20px}
+.top{padding-top:44px}
+h1{font:800 clamp(1.9rem,6vw,2.9rem)/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 12px;letter-spacing:-.02em}
+.lead{color:var(--muted);margin:0 0 22px}
+#search{width:100%;padding:13px 14px;font:inherit;color:var(--ink);background:transparent;
+  border:2px solid var(--ink);border-radius:6px}
+#search:focus-visible,.chips button:focus-visible,.row a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;margin-bottom:6px}
+.chips button{font:inherit;font-size:.92rem;padding:6px 12px;border:1px solid var(--line);
+  background:var(--chip);color:var(--ink);border-radius:999px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.count{color:var(--muted);font-size:.92rem;margin:18px 0 4px}
+.row{display:grid;grid-template-columns:150px 1fr;gap:6px 22px;padding:18px 0;border-top:1px solid var(--line)}
+.row:last-child{border-bottom:1px solid var(--line)}
+.paid{font:600 1rem "Bricolage Grotesque",system-ui,sans-serif;color:var(--strike);text-decoration:line-through;text-decoration-thickness:2px;overflow-wrap:anywhere}
+.row h2{font:800 1.3rem "Bricolage Grotesque",system-ui,sans-serif;margin:0}
+.row p{margin:2px 0 6px}
+.meta{color:var(--muted);font-size:.9rem}
+.row a{color:var(--accent);font-weight:600}
+.empty{padding:28px 0;color:var(--muted)}
+.foot{padding-top:30px;padding-bottom:40px;color:var(--muted);font-size:.9rem}
+.sr{position:absolute;left:-9999px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Stop paying. Switch to free software.</h1>
+  <p class="lead">Free and open-source alternatives to the paid tools you already know.</p>
+  <label class="sr" for="search">Search software</label>
+  <input id="search" type="search" placeholder="Search: Photoshop, Zoom, Tally..." autocomplete="off">
+</header>
+<nav id="categories" class="chips" aria-label="Categories"></nav>
+<main>
+  <p id="count" class="count" aria-live="polite"></p>
+  <div id="list"></div>
+</main>
+<footer class="foot">
+  <p>opensoftware.in lists free and open-source software. Check each project's website for current licence and features.</p>
+</footer>
+<script>
+const SOFTWARE = [
+ {
+  "name": "GIMP",
+  "category": "Design and Graphics",
+  "replaces": "Photoshop",
+  "description": "Powerful image editor for photo retouching, graphics and compositing.",
+  "website": "https://www.gimp.org"
+ },
+ {
+  "name": "Inkscape",
+  "category": "Design and Graphics",
+  "replaces": "Illustrator",
+  "description": "Vector graphics editor for logos, icons and illustrations.",
+  "website": "https://inkscape.org"
+ },
+ {
+  "name": "LibreOffice",
+  "category": "Office and Productivity",
+  "replaces": "MS Office",
+  "description": "Full office suite with Writer, Calc and Impress for documents, sheets and slides.",
+  "website": "https://www.libreoffice.org"
+ },
+ {
+  "name": "AppFlowy",
+  "category": "Office and Productivity",
+  "replaces": "Notion",
+  "description": "Notes, wikis and project boards you can run on your own data.",
+  "website": "https://appflowy.io"
+ },
+ {
+  "name": "Kdenlive",
+  "category": "Video and Audio",
+  "replaces": "Premiere Pro",
+  "description": "Multi-track video editor with titles, effects and colour tools.",
+  "website": "https://kdenlive.org"
+ },
+ {
+  "name": "Audacity",
+  "category": "Video and Audio",
+  "replaces": "Adobe Audition",
+  "description": "Record and edit audio, clean noise and export podcasts.",
+  "website": "https://www.audacityteam.org"
+ },
+ {
+  "name": "OBS Studio",
+  "category": "Video and Audio",
+  "replaces": "Camtasia",
+  "description": "Record your screen and live stream with scenes and overlays.",
+  "website": "https://obsproject.com"
+ },
+ {
+  "name": "ERPNext",
+  "category": "Accounting and Finance",
+  "replaces": "Tally",
+  "description": "Accounting, inventory and invoicing with GST support, built in India.",
+  "website": "https://erpnext.com"
+ },
+ {
+  "name": "GnuCash",
+  "category": "Accounting and Finance",
+  "replaces": "QuickBooks",
+  "description": "Double-entry accounting for personal and small business books.",
+  "website": "https://www.gnucash.org"
+ },
+ {
+  "name": "SuiteCRM",
+  "category": "Business and CRM",
+  "replaces": "Salesforce",
+  "description": "CRM for leads, deals, customers and sales reports.",
+  "website": "https://suitecrm.com"
+ },
+ {
+  "name": "EspoCRM",
+  "category": "Business and CRM",
+  "replaces": "Zoho CRM",
+  "description": "Light, easy CRM for small teams to track contacts and sales.",
+  "website": "https://www.espocrm.com"
+ },
+ {
+  "name": "Bruno",
+  "category": "Developer Tools",
+  "replaces": "Postman",
+  "description": "API client that stores your requests as plain files you can version.",
+  "website": "https://www.usebruno.com"
+ },
+ {
+  "name": "DBeaver Community",
+  "category": "Developer Tools",
+  "replaces": "DataGrip",
+  "description": "One database tool for MySQL, PostgreSQL, SQLite and many more.",
+  "website": "https://dbeaver.io"
+ },
+ {
+  "name": "Jitsi Meet",
+  "category": "Communication and Meetings",
+  "replaces": "Zoom",
+  "description": "Video meetings in the browser with no account needed.",
+  "website": "https://jitsi.org/jitsi-meet"
+ },
+ {
+  "name": "Mattermost",
+  "category": "Communication and Meetings",
+  "replaces": "Slack",
+  "description": "Team chat with channels and file sharing that you can host yourself.",
+  "website": "https://mattermost.com"
+ },
+ {
+  "name": "Moodle",
+  "category": "Education and eLearning",
+  "replaces": "Blackboard",
+  "description": "Learning platform for courses, assignments and quizzes.",
+  "website": "https://moodle.org"
+ },
+ {
+  "name": "BigBlueButton",
+  "category": "Education and eLearning",
+  "replaces": "Zoom for classes",
+  "description": "Virtual classroom with whiteboard, polls and breakout rooms.",
+  "website": "https://bigbluebutton.org"
+ },
+ {
+  "name": "Bitwarden",
+  "category": "Security and Privacy",
+  "replaces": "LastPass",
+  "description": "Password manager for browsers and phones with secure sharing.",
+  "website": "https://bitwarden.com"
+ },
+ {
+  "name": "KeePassXC",
+  "category": "Security and Privacy",
+  "replaces": "1Password",
+  "description": "Offline password manager that keeps your vault in a local file.",
+  "website": "https://keepassxc.org"
+ },
+ {
+  "name": "WordPress",
+  "category": "Website and eCommerce",
+  "replaces": "Wix",
+  "description": "Build websites and blogs with thousands of themes and plugins.",
+  "website": "https://wordpress.org"
+ },
+ {
+  "name": "Ghost",
+  "category": "Website and eCommerce",
+  "replaces": "Substack",
+  "description": "Publishing platform for blogs and paid newsletters.",
+  "website": "https://ghost.org"
+ }
+];
+
+const state = { data: [], cat: "All", q: "" };
+const $ = id => document.getElementById(id);
+
+state.data = SOFTWARE;
+buildChips();
+render();
+
+function buildChips() {
+  const cats = ["All", ...new Set(state.data.map(x => x.category))];
+  const nav = $("categories");
+  nav.textContent = "";
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = c;
+    b.setAttribute("aria-pressed", c === state.cat);
+    b.addEventListener("click", () => { state.cat = c; buildChips(); render(); });
+    nav.appendChild(b);
+  });
+}
+
+function render() {
+  const q = state.q.trim().toLowerCase();
+  const items = state.data.filter(x =>
+    (state.cat === "All" || x.category === state.cat) &&
+    (x.name + " " + x.replaces + " " + x.description + " " + x.category).toLowerCase().includes(q)
+  );
+  $("count").textContent = items.length + (items.length === 1 ? " tool" : " tools");
+  const list = $("list");
+  list.textContent = "";
+  if (!items.length) {
+    const p = document.createElement("p");
+    p.className = "empty";
+    p.textContent = "No match. Try a different word or choose another category.";
+    list.appendChild(p);
+    return;
+  }
+  items.forEach(x => {
+    const row = document.createElement("article");
+    row.className = "row";
+    const paid = document.createElement("div");
+    paid.className = "paid";
+    paid.textContent = x.replaces;
+    const body = document.createElement("div");
+    const h = document.createElement("h2");
+    h.textContent = x.name;
+    const p = document.createElement("p");
+    p.textContent = x.description;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = x.category + " · ";
+    const a = document.createElement("a");
+    a.href = x.website;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Visit " + x.name;
+    meta.appendChild(a);
+    body.append(h, p, meta);
+    row.append(paid, body);
+    list.appendChild(row);
+  });
+}
+
+$("search").addEventListener("input", e => { state.q = e.target.value; render(); });
+</script>
+</body>
+</html>
